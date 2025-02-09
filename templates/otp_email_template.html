@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTP Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { padding: 20px; border: 1px solid #ddd; border-radius: 8px; width: 80%; margin: auto; background-color: #f9f9f9; }
+        .otp { font-size: 24px; font-weight: bold; color: #2d89ef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>OTP Verification</h2>
+        <p>Dear User,</p>
+        <p>Your One-Time Password (OTP) for verification is:</p>
+        <p class="otp">{{ otp }}</p>
+        <p>This OTP is valid for 1 minute. Please do not share it with anyone.</p>
+        <p>If you did not request this OTP, please ignore this email.</p>
+        <p>Thank you,<br><strong>Test</strong></p>
+    </div>
+</body>
+</html>
