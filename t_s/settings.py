@@ -150,3 +150,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ajayverma6367006928@gmail.com'
 EMAIL_HOST_PASSWORD = 'czbswhxfecvcrspn'
+
+# Razorpay configs
+RAZORPAY_KEY_ID = "rzp_test_US5QPaXrbvS5lj"
+RAZORPAY_SECRET = "ZaILMq9xceGyJuvrLvTbMtGD"

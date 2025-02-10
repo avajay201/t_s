@@ -32,6 +32,10 @@ class OrderSerializer(serializers.ModelSerializer):
         for item in items:
             order.items.add(item)
 
+        order.total_price = sum(item.food_item.price * item.quantity for item in order.items.all())
+        if order.payment_method == "UPI":
+            order.generate_qr_code_url()
+
         order.save()
         return order
 
@@ -39,4 +43,4 @@ class OrderSerializer(serializers.ModelSerializer):
 class OrderViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ['id', 'order_id', 'order_number', 'total_price', 'payment_method', 'payment_status', 'created_at']
+        fields = ['id', 'order_id', 'order_number', 'total_price', 'payment_method', 'payment_code', 'order_status', 'created_at']
