@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('order_number', models.PositiveIntegerField()),
                 ('total_price', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
                 ('payment_method', models.CharField(choices=[('CASH', 'Cash'), ('UPI', 'UPI')], default='CASH', max_length=10)),
-                ('payment_status', models.CharField(choices=[('PENDING', 'Pending'), ('PAID', 'Paid'), ('CANCELLED', 'Cancelled')], default='PENDING', max_length=10)),
+                ('payment_status', models.CharField(choices=[('PENDING', 'Pending'), ('PAID', 'Paid'), ('CANCELLED', 'Cancelled'), ('FAILED', 'Failed')], default='PENDING', max_length=10)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('items', models.ManyToManyField(related_name='order', to='orders.orderitem')),
                 ('seller', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orders', to='accounts.seller')),
