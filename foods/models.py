@@ -1,5 +1,5 @@
-from accounts.models import Seller
 from django.db import models
+from accounts.models import Seller
 
 
 

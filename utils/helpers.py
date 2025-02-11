@@ -15,3 +15,13 @@ def serializer_first_error(serializer):
     except Exception as err:
         print('Error:', err)
         return 'Something went wrong.'
+
+
+def validate_query_params(valid_params, params):
+    '''
+    Check given params is correct or not.
+    '''
+    for param_key in params:
+        if param_key not in valid_params:
+            return None
+    return True

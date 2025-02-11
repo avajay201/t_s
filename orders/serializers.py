@@ -1,5 +1,5 @@
-from rest_framework import serializers
 from .models import Order, OrderItem
+from rest_framework import serializers
 
 
 
@@ -35,6 +35,9 @@ class OrderSerializer(serializers.ModelSerializer):
         order.total_price = sum(item.food_item.price * item.quantity for item in order.items.all())
         if order.payment_method == "UPI":
             order.generate_qr_code_url()
+
+        if order.payment_method == "CASH":
+            order.order_status = 'PAID'
 
         order.save()
         return order

@@ -1,19 +1,19 @@
-from datetime import timedelta
 from django.contrib.auth import authenticate
-from django.conf import settings
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from django.utils.timezone import now
 from .models import OTP, Seller, User, Account
 import random
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.template.loader import render_to_string
+from rest_framework.response import Response
 from .serializers import RegistrationSerializer, AccountSerializer
+from django.core.mail import send_mail
 from utils.helpers import serializer_first_error
+from django.conf import settings
+from rest_framework import status
+from django.utils.html import strip_tags
+from datetime import timedelta
 
 
 
