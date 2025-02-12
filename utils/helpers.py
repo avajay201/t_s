@@ -1,11 +1,9 @@
 import re
+from rest_framework.pagination import PageNumberPagination
 
 
 
 def serializer_first_error(serializer):
-    '''
-    Extracts and formats the first validation error message from a given serializer.
-    '''
     try:
         error_key = list(serializer.errors.keys())[0]
         error_value = list(serializer.errors.values())[0][0]
@@ -15,3 +13,16 @@ def serializer_first_error(serializer):
     except Exception as err:
         print('Error:', err)
         return 'Something went wrong.'
+
+
+def validate_query_params(valid_params, params):
+    for param_key in params:
+        if param_key not in valid_params:
+            return None
+    return True
+
+
+class OrderPagination(PageNumberPagination):
+    page_size = 20
+    page_size_query_param = 'page_size'
+    max_page_size = 100

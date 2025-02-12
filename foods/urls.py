@@ -1,5 +1,7 @@
-from django.urls import path
 from .views import CategoryView, FoodItemView
+from django.urls import path
+
+
 
 urlpatterns = [
     path('categories/', CategoryView.as_view(), name='category-list-create'),

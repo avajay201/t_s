@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
 from .models import Category, FoodItem
 from .serializers import CategorySerializer, FoodItemSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from utils.helpers import serializer_first_error
+from rest_framework import status
 
 
 

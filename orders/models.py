@@ -1,15 +1,15 @@
-from accounts.models import Seller
-from datetime import timedelta
-from django.conf import settings
+from foods.models import FoodItem
 from django.db import models
 from django.utils.timezone import now
-from foods.models import FoodItem
 import random
 import razorpay
+from accounts.models import Seller
+from django.conf import settings
+from datetime import timedelta
+
 
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_SECRET))
-print('***', dir(client))
 
 
 class OrderItem(models.Model):
@@ -45,7 +45,9 @@ class Order(models.Model):
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHODS, default='CASH')
     order_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
     qr_expiry_time = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('seller', 'order_number')
@@ -87,4 +89,4 @@ class Order(models.Model):
             self.save(update_fields=['order_status'])
 
     def __str__(self):
-        return f"Order {self.order_number} - {self.seller.business_name} - ₹{self.total_price}"
+        return f"Order {self.order_number} - {self.seller.business_name}"
