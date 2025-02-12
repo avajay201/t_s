@@ -15,6 +15,7 @@ class OTP(models.Model):
     def __str__(self):
         return f'{self.otp} for {self.email}'
 
+
 class Seller(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_pic = models.ImageField(upload_to='sellers/profiles')
@@ -27,6 +28,7 @@ class Seller(models.Model):
 
     def __str__(self):
         return f'{self.business_name} - {self.user.username}'
+
 
 class Account(models.Model):
     account_type_choices = (

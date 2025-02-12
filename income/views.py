@@ -100,8 +100,6 @@ class IncomeGraphAPIView(APIView):
         try:
             current_date = datetime.strptime(reference_date, "%Y-%m-%d").date()
             reference_year = datetime.strptime(reference_year, "%Y").year
-            # if current_date > localdate() or (current_date.month < request.user.seller.created_at.date().month and current_date.year < request.user.seller.created_at.date().year) or current_date.day != 1:
-            #     return Response({'error': 'Invalid request.'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print('Error:', e)
             if reference_year:
@@ -112,13 +110,9 @@ class IncomeGraphAPIView(APIView):
 
         if period == 'daily':
             current_date = self._handle_daily_period(request, current_date, proceed)
-            # if not current_date:
-            #     return Response({'error': 'Invalid request.'}, status=status.HTTP_400_BAD_REQUEST)
             response_data = self.__get_daily_data(current_date, orders)
         elif period == 'weekly':
             current_date = self._handle_weekly_period(request, current_date, proceed)
-            # if not current_date:
-            #     return Response({'error': 'Invalid request.'}, status=status.HTTP_400_BAD_REQUEST)
             response_data = self.__get_weekly_data(request, current_date, orders)
         elif period == 'monthly':
             filter_year = datetime.now().year
@@ -134,9 +128,6 @@ class IncomeGraphAPIView(APIView):
                 filter_month = 12
                 filter_months = list(range(1, filter_month + 1))
 
-            # if filter_year > localdate().year or filter_year < request.user.seller.created_at.year:
-            #     return Response({'error': 'Invalid request.'}, status=status.HTTP_400_BAD_REQUEST)
-
             filter_data = (
                 orders
                 .filter(created_at__year=filter_year, created_at__month__in=filter_months)
@@ -148,18 +139,23 @@ class IncomeGraphAPIView(APIView):
             data = [
                 {
                     "month": entry["month"].strftime("%b %Y"),
-                    "total": entry["total"]
+                    "total": f"Rs. {entry['total']:.2f}"
                 }
                 for entry in filter_data
             ]
+            
+            back_exists = orders.filter(created_at__year=filter_year - 1).exists()
+            next_exists = orders.filter(created_at__year=filter_year + 1).exists()
             response_data['data'] = data
             response_data['reference_year'] = reference_year
+            response_data['back_exists'] = back_exists
+            response_data['next_exists'] = next_exists
         elif period == 'yearly':
             filter_data = orders.annotate(year=TruncYear('created_at')).values('year').annotate(total=Sum('total_price')).order_by('year')
             response_data = [
                 {
                     "year": entry["year"].strftime("%Y"),
-                    "total": entry["total"]
+                    "total": f"Rs. {entry['total']:.2f}"
                 }
                 for entry in filter_data
             ]
@@ -171,13 +167,9 @@ class IncomeGraphAPIView(APIView):
     def _handle_daily_period(self, request, current_date, proceed):
         if proceed == 'back':
             current_date = (current_date - timedelta(days=1)).replace(day=1)
-            # if current_date.month < request.user.seller.created_at.date().month or current_date.year < request.user.seller.created_at.date().year:
-            #     return
         elif proceed == 'next':
             days_in_month = monthrange(current_date.year, current_date.month)[1]
             current_date = current_date + timedelta(days=days_in_month)
-            # if current_date.month < request.user.seller.created_at.date().month or current_date.year < request.user.seller.created_at.date().year or current_date > localdate():
-            #     return
         return current_date
 
     def __get_daily_data(self, current_date, orders):
@@ -194,23 +186,26 @@ class IncomeGraphAPIView(APIView):
             formatted_date = record['date'].strftime("%d %b")
             income_data[formatted_date] = f"Rs. {record['total']:.2f}"
         month_name = current_date.strftime("%B %Y")
+
+        previous_month_start = (month_start.replace(day=1) - timedelta(days=1)).replace(day=1)
+        next_month_start = (month_end.replace(day=1) + timedelta(days=31)).replace(day=1)
+        back_exists = orders.filter(created_at__date__lt=previous_month_start).exists()
+        next_exists = orders.filter(created_at__date__gte=next_month_start).exists()
         data = {
             "month": month_name,
             "reference_date": current_date.strftime("%Y-%m-%d"),
-            "income_data": income_data
+            "income_data": income_data,
+            "back": back_exists,
+            "next": next_exists
         }
         return data
 
     def _handle_weekly_period(self, request, current_date, proceed):
         if proceed == 'back':
             current_date = (current_date.replace(day=1) - timedelta(days=1)).replace(day=1)
-            # if current_date < request.user.seller.created_at.date():
-            #     return
         elif proceed == 'next':
             days_in_month = monthrange(current_date.year, current_date.month)[1]
             current_date = current_date + timedelta(days=days_in_month)
-            # if current_date > localdate():
-            #     return
         return current_date
 
     def __get_weekly_data(self, request, current_date, orders):
@@ -235,8 +230,16 @@ class IncomeGraphAPIView(APIView):
 
             week_start_date += timedelta(days=7)
 
+        previous_week_start = month_start - timedelta(days=7)
+        next_week_start = month_end + timedelta(days=1)
+
+        back_exists = orders.filter(created_at__date__lt=previous_week_start).exists()
+        next_exists = orders.filter(created_at__date__gte=next_week_start).exists()
+
         return {
             "month": current_date.strftime("%B %Y"),
             "reference_date": current_date.strftime("%Y-%m-%d"),
-            "income_data": income_data
+            "income_data": income_data,
+            "back": back_exists,
+            "next": next_exists
         }
